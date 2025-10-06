@@ -1,6 +1,8 @@
-Pygame Ping Pong (Classic Arcade Clone)
+# Pygame Ping Pong (Classic Arcade Clone)
+
 This is a two-player (Player vs. AI) implementation of the classic arcade game, Pong, built using the Pygame library in Python. The game features responsive controls, AI movement, and a complete game cycle including scoring, game over, and an interactive replay menu.
 
+---
 🚀 How to Run the Project
 Prerequisites
 Python 3.x
@@ -10,6 +12,9 @@ Pygame library (pip install pygame)
 File Structure
 The project assumes the following directory structure, which is critical for the sound effects to load correctly:
 
+---
+
+```
 /ping_pong_project
 |-- main.py
 |-- game/
@@ -21,14 +26,24 @@ The project assumes the following directory structure, which is critical for the
 |   |-- paddle_hit.wav
 |   |-- wall_bounce.wav
 |   |-- score.wav
-
+```
 
 Execution
 Ensure you have your .wav files in the assets/ folder.
 
-Run the main file from your terminal:
+1. Clone the repo or download the project folder.
+2. Make sure you have Python 3.10+ installed.
+3. Install dependencies:
 
+```bash
+pip install -r requirements.txt
+```
+
+4. Run the game:
+
+```bash
 python main.py
+```
 
 ✅ Project Evolution: Feature Log
 This section details the development steps and the logic implemented for each new feature request.
