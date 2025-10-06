@@ -1,137 +1,85 @@
-# Project: Real-Time Ping Pong Game
+Pygame Ping Pong (Classic Arcade Clone)
+This is a two-player (Player vs. AI) implementation of the classic arcade game, Pong, built using the Pygame library in Python. The game features responsive controls, AI movement, and a complete game cycle including scoring, game over, and an interactive replay menu.
 
-This project is a terminal-based ping pong game using **Pygame**. It introduces students to interactive game design using object-oriented principles and real-time graphical rendering.
+🚀 How to Run the Project
+Prerequisites
+Python 3.x
 
----
+Pygame library (pip install pygame)
 
-## What’s Provided
+File Structure
+The project assumes the following directory structure, which is critical for the sound effects to load correctly:
 
-A partially working version of a ping pong game with:
+/ping_pong_project
+|-- main.py
+|-- game/
+|   |-- __init__.py
+|   |-- game_engine.py
+|   |-- paddle.py
+|   |-- ball.py
+|-- assets/
+|   |-- paddle_hit.wav
+|   |-- wall_bounce.wav
+|   |-- score.wav
 
-- Player and AI-controlled paddles
-- Ball movement with basic collision
-- Score display
 
-You are expected to **analyze**, **interact with an AI assistant**, and **complete/fix** the game to make it fully functional. 
+Execution
+Ensure you have your .wav files in the assets/ folder.
 
-### **Use ChatGPT as the LLM for vibecoding in this Lab.**
+Run the main file from your terminal:
 
----
-
-## Getting Started
-
-### Setup
-
-1. Clone the repo or download the project folder.
-2. Make sure you have Python 3.10+ installed.
-3. Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-4. Run the game:
-
-```bash
 python main.py
-```
 
----
+✅ Project Evolution: Feature Log
+This section details the development steps and the logic implemented for each new feature request.
 
-## Initial Prompt Template (To Use With LLM)
+1. Game Over Screen and Score Limit (Initial Implementation)
+Goal: End the game at 5 points, display a winner message, and freeze the action for a clear game-over state.
 
-Use this to begin your interaction with the LLM:
+Solution Approach:
 
-```
-I’m working on a real-time Ping Pong game using Python and Pygame. I have a partially working project structure. Please help me understand how the logic is organized and guide me on implementing missing features. Review any code I send to ensure it aligns with the expected behavior.
-```
+Game State Management: A boolean variable, self.game_active, was introduced in GameEngine. All primary game logic (ball.move(), collision checks) were wrapped inside an if self.game_active: block in GameEngine.update().
 
----
+Win Condition Check: The GameEngine.update() method was updated to check if self.player_score or self.ai_score reached the initial limit (5). If so, self.game_active was set to False, and self.winner was set.
 
-## Quick Start Prompts for Each Task
+Rendering the Message: The GameEngine.render() method was enhanced to check if not self.game_active. When the game is over, it uses Pygame's font.render() to draw the "Player Wins!" or "AI Wins!" message and a slightly transparent grey overlay to highlight the message.
 
-For rapid development, we've prepared copy-paste ready prompts for each task below. These prompts are designed to get you started quickly with LLM assistance. Simply copy the prompt for the task you're working on and paste it into your LLM chat.
+2. Interactive Replay Feature
+Goal: Replace the hard-coded exit delay with an interactive menu to start a new match with variable score limits (Best of 3/5/7) or exit.
 
-**Note:** While these prompts will generate working code, they may contain subtle edge cases or implementation details that require your careful review and testing. This is intentional to help you develop critical code review skills.
+Solution Approach:
 
----
+Dynamic Score Limit: The GameEngine constructor was updated to accept initial_score_limit, making the winning score dynamic (self.score_limit).
 
-## Tasks to Complete
+The Replay Method: A new method, GameEngine.reset_game(new_limit), was created. This method handles resetting both scores to 0, resetting the ball's position, resetting the paddle positions (by calling a new paddle.reset_position() method), setting the new score_limit, and setting self.game_active = True.
 
-Each task must be completed using an iterative process involving LLM suggestions and your critical code review.
+Input Handling in main.py: The main game loop now explicitly checks keyboard events (pygame.K_3, pygame.K_5, pygame.K_7, pygame.K_ESCAPE) only when the game is inactive (if not engine.game_active).
 
-### Task 1: Refine Ball Collision
+If a limit key (3, 5, or 7) is pressed, it calls engine.reset_game(value).
 
-> The ball sometimes passes through paddles at high speed. Investigate and enhance collision accuracy.
+If ESC is pressed, it quits the main loop.
 
-**Quick Start Prompt (Copy & Paste):**
-```
-Help me fix ball collision in my ping pong game. The ball passes through paddles sometimes. I need to check if the ball's rectangle overlaps with paddle rectangles and reverse velocity_x when it happens. Just add the collision check right after moving the ball, that should work perfectly for high speeds.
-```
+UI Update: The GameEngine.render() function was updated to display the interactive menu options (e.g., (3) Best of 3) below the winner announcement when the game is inactive.
 
-### Task 2: Implement Game Over Condition
+3. Sound Effects Integration
+Goal: Add audio feedback for paddle hits, wall bounces, and scoring.
 
-> Add a screen that displays the winner once one player reaches a defined score (e.g., 5), then gracefully exits or restarts.
+Solution Approach:
 
-**Quick Start Prompt (Copy & Paste):**
-```
-I need a game over screen when a player reaches 5 points. Create a method that checks if either score equals 5, then display "Player Wins!" or "AI Wins!" on screen. Make sure to keep the game loop running so players can see the message. Add a small delay before closing pygame.
-```
+Initialization & Loading:
 
-### Task 3: Add Replay Option
+pygame.mixer.init() was called at the start of ball.py.
 
-> After Game Over, allow the user to play again with best of 3, 5, or 7 option, or exit.
+Sound objects were loaded in Ball.__init__ using pygame.mixer.Sound(), referencing files in the assets/ directory (e.g., "assets/paddle_hit.wav"). Robust error handling (try/except) was added for sound loading failures.
 
-**Quick Start Prompt (Copy & Paste):**
-```
-Add a replay feature after game over. Show options for "Best of 3", "Best of 5", "Best of 7", or "Exit". Wait for user input (keys 3, 5, 7, or ESC). When they choose, update the winning score target and reset the ball position. That should let them play again.
-```
+Paddle Hit and Wall Bounce: The sound playing logic was placed directly inside the Ball.move() and Ball.check_collision() methods:
 
-### Task 4: Add Sound Feedback
+When the ball hits the top/bottom wall and self.velocity_y is reversed, self.wall_bounce_sound.play() is called.
 
-> Add basic sound effects for paddle hit, wall bounce, and score.
+When the ball collides with a paddle and self.velocity_x is reversed, self.paddle_hit_sound.play() is called.
 
-**Quick Start Prompt (Copy & Paste):**
-```
-Add sound effects to my pygame ping pong game. Load .wav files for paddle hit, wall bounce, and scoring using pygame.mixer.Sound(). Play the sounds whenever ball.velocity_x or ball.velocity_y changes. Initialize pygame.mixer at the start of the file.
-```
+Scoring Sound:
 
----
+A dedicated method, Ball.play_score_sound(), was created.
 
-## Expected Behavior
-
-- Smooth paddle movement using `W` and `S`
-- AI tracks and plays competitively
-- Ball rebounds on paddle and wall hits
-- Score updates on each miss
-- Game ends and optionally restarts when limit reached
-
----
-
-## Folder Structure
-
-```
-pygame-pingpong/
-├── main.py
-├── requirements.txt
-├── game/
-│   ├── game_engine.py
-│   ├── paddle.py
-│   └── ball.py
-└── README.md
-```
-
----
-
-## Submission Checklist
-
-- [] All 4 tasks completed
-- [] Game behaves as expected
-- [] No bugs or crashes
-- [] Code reviewed with LLM
-- [] Final score and winner display works correctly
-- [] Score appears correctly on both player and AI sides
-- [] Dependencies listed in `requirements.txt`
-- [] README is followed during setup and testing
-- [] Codebase is clean, modular, and understandable
-- [] Submission should include the Chat/LLM used Page link with the complete chat history.
+This method is called from the GameEngine.update() method immediately after a score is registered (i.e., when scored = True) and before the ball is reset.
